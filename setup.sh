@@ -28,6 +28,7 @@ echo
 echo "** Note: hostname must resolve to this machine already, to enable Let's Encrypt certificate setup **"
 read -p "Hostname for VPN (e.g. vpn.example.com): " VPNHOST
 
+apt -y install dnsutils
 VPNHOSTIP=$(dig -4 +short "$VPNHOST")
 [[ -n "$VPNHOSTIP" ]] || exit_badly "Cannot resolve VPN hostname, aborting"
 
@@ -45,7 +46,7 @@ echo
 echo "--- Configuration: general server settings ---"
 echo
 
-read -p "Timezone (default: Europe/London): " TZONE
+read -p "Timezone (default: Europe/Paris): " TZONE
 TZONE=${TZONE:-'Europe/Paris'}
 
 read -p "Email address for sysadmin (e.g. j.bloggs@example.com): " EMAIL
