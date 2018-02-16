@@ -11,7 +11,7 @@
 # ./setup.sh
 
 echo
-echo "=== https://github.com/jawj/IKEv2-setup ==="
+echo "=== https://github.com/nribault/IKEv2-setup ==="
 echo
 
 function exit_badly {
@@ -46,7 +46,7 @@ echo "--- Configuration: general server settings ---"
 echo
 
 read -p "Timezone (default: Europe/London): " TZONE
-TZONE=${TZONE:-'Europe/London'}
+TZONE=${TZONE:-'Europe/Paris'}
 
 read -p "Email address for sysadmin (e.g. j.bloggs@example.com): " EMAIL
 
@@ -179,8 +179,8 @@ ln -f -s /etc/letsencrypt/live/$VPNHOST/cert.pem    /etc/ipsec.d/certs/cert.pem
 ln -f -s /etc/letsencrypt/live/$VPNHOST/privkey.pem /etc/ipsec.d/private/privkey.pem
 ln -f -s /etc/letsencrypt/live/$VPNHOST/chain.pem   /etc/ipsec.d/cacerts/chain.pem
 
-grep -Fq 'jawj/IKEv2-setup' /etc/apparmor.d/local/usr.lib.ipsec.charon || echo "
-# https://github.com/jawj/IKEv2-setup
+grep -Fq 'nribault/IKEv2-setup' /etc/apparmor.d/local/usr.lib.ipsec.charon || echo "
+# https://github.com/nribault/IKEv2-setup
 /etc/letsencrypt/archive/${VPNHOST}/* r,
 " >> /etc/apparmor.d/local/usr.lib.ipsec.charon
 
@@ -195,8 +195,8 @@ echo
 # ip_no_pmtu_disc is for UDP fragmentation
 # others are for security
 
-grep -Fq 'jawj/IKEv2-setup' /etc/sysctl.conf || echo '
-# https://github.com/jawj/IKEv2-setup
+grep -Fq 'nribault/IKEv2-setup' /etc/sysctl.conf || echo '
+# https://github.com/nribault/IKEv2-setup
 net.ipv4.ip_forward = 1
 net.ipv4.ip_no_pmtu_disc = 1
 net.ipv4.conf.all.rp_filter = 1
@@ -269,8 +269,8 @@ sed -r \
 -e 's/^#?UsePAM yes$/UsePAM no/' \
 -i.original /etc/ssh/sshd_config
 
-grep -Fq 'jawj/IKEv2-setup' /etc/ssh/sshd_config || echo "
-# https://github.com/jawj/IKEv2-setup
+grep -Fq 'nribault/IKEv2-setup' /etc/ssh/sshd_config || echo "
+# https://github.com/nribault/IKEv2-setup
 MaxStartups 1
 MaxAuthTries 2
 UseDNS no" >> /etc/ssh/sshd_config
@@ -291,8 +291,8 @@ sed -r \
 -e 's/^inet_interfaces =.*$/inet_interfaces = loopback-only/' \
 -i.original /etc/postfix/main.cf
 
-grep -Fq 'jawj/IKEv2-setup' /etc/aliases || echo "
-# https://github.com/jawj/IKEv2-setup
+grep -Fq 'nribault/IKEv2-setup' /etc/aliases || echo "
+# https://github.com/nribault/IKEv2-setup
 root: ${EMAIL}
 ${LOGINUSERNAME}: ${EMAIL}
 " >> /etc/aliases
@@ -452,8 +452,8 @@ apt-get install -y libcharon-standard-plugins || true  # 17.04+ only
 
 ln -f -s /etc/ssl/certs/DST_Root_CA_X3.pem /etc/ipsec.d/cacerts/
 
-grep -Fq 'jawj/IKEv2-setup' /etc/ipsec.conf || echo "
-# https://github.com/jawj/IKEv2-setup
+grep -Fq 'nribault/IKEv2-setup' /etc/ipsec.conf || echo "
+# https://github.com/nribault/IKEv2-setup
 conn ikev2vpn
         ikelifetime=60m
         keylife=20m
@@ -472,8 +472,8 @@ conn ikev2vpn
         auto=add  # or auto=start to bring up automatically
 " >> /etc/ipsec.conf
 
-grep -Fq 'jawj/IKEv2-setup' /etc/ipsec.secrets || echo "
-# https://github.com/jawj/IKEv2-setup
+grep -Fq 'nribault/IKEv2-setup' /etc/ipsec.secrets || echo "
+# https://github.com/nribault/IKEv2-setup
 \${VPNUSERNAME} %any : EAP \"\${VPNPASSWORD}\"
 " >> /etc/ipsec.secrets
 
