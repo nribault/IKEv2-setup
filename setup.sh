@@ -1,12 +1,12 @@
 #!/bin/bash -e
 
 # == Update to 18.04 if required:
-# nano /etc/update-manager/release-upgrades -> Prompt=normal
-# apt-get update
-# do-release-upgrade
+# apt update ; apt -y dist-upgrade
+# apt -y install update-manager-core
+# sudo do-release-upgrade -d -q
 
 # == Then run this script
-# wget https://raw.githubusercontent.com/jawj/IKEv2-setup/master/setup.sh
+# wget https://raw.githubusercontent.com/nribault/IKEv2-setup/master/setup.sh
 # chmod u+x setup.sh
 # ./setup.sh
 
