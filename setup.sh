@@ -211,8 +211,8 @@ net.ipv6.conf.lo.disable_ipv6 = 1
 sysctl -p
 
 # these ike and esp settings are tested on Mac 10.12, iOS 10 and Windows 10
-# iOS/Mac with appropriate configuration profiles use AES_GCM_16_256/PRF_HMAC_SHA2_256/ECP_521 
-# Windows 10 uses AES_CBC_256/HMAC_SHA2_256_128/PRF_HMAC_SHA2_256/ECP_384 
+# iOS/Mac with appropriate configuration profiles use AES_GCM_16_256/PRF_HMAC_SHA2_256/ECP_521
+# Windows 10 uses AES_CBC_256/HMAC_SHA2_256_128/PRF_HMAC_SHA2_256/ECP_384
 
 echo "config setup
   strictcrlpolicy=yes
@@ -373,7 +373,7 @@ cat << EOF > vpn-ios-or-mac.mobileconfig
         <key>LocalIdentifier</key>
         <string>${VPNHOST}</string>
         <key>OnDemandEnabled</key>
-        <integer>1</integer>
+        <integer>0</integer>
         <key>OnDemandRules</key>
         <array>
           <dict>
@@ -549,4 +549,3 @@ echo "Connection instructions have been emailed to you, and can also be found in
 # necessary for IKEv2?
 # Windows: https://support.microsoft.com/en-us/kb/926179
 # HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\PolicyAgent += AssumeUDPEncapsulationContextOnSendRule, DWORD = 2
-
