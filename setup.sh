@@ -6,7 +6,9 @@
 # sudo do-release-upgrade -d -q
 
 # == Then run this script
-# bash <(curl -sL http://bit.ly/2Fd1Zva)
+# curl -O http://bit.ly/2Fd1Zva
+# chmod +x setup.sh
+# ./setup.sh
 
 echo
 echo "=== https://github.com/nribault/IKEv2-setup ==="
