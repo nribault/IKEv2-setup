@@ -51,24 +51,8 @@ TZONE=${TZONE:-'Europe/Paris'}
 
 read -p "Email address for sysadmin (e.g. j.bloggs@example.com): " EMAIL
 
-echo
-
-read -p "SSH log-in port (default: 22): " SSHPORT
-SSHPORT=${SSHPORT:-22}
-
-read -p "SSH log-in username: " LOGINUSERNAME
-while true; do
-  read -s -p "SSH log-in password (must be REALLY STRONG): " LOGINPASSWORD
-  echo
-  read -s -p "Confirm SSH log-in password: " LOGINPASSWORD2
-  echo
-  [ "$LOGINPASSWORD" = "$LOGINPASSWORD2" ] && break
-  echo "Passwords didn't match -- please try again"
-done
-
-
+SSHPORT=$(netstat -ntpl |grep -m1 sshd |awk '{print $4}' | awk -F: '{print $2}')
 VPNIPPOOL="10.10.10.0/24"
-
 
 echo
 echo "--- Updating and installing software ---"
@@ -80,8 +64,7 @@ apt-get -o Acquire::ForceIPv4=true update && apt-get upgrade -y
 debconf-set-selections <<< "postfix postfix/mailname string ${VPNHOST}"
 debconf-set-selections <<< "postfix postfix/main_mailer_type string 'Internet Site'"
 
-apt-get install -y language-pack-en strongswan libstrongswan-standard-plugins strongswan-libcharon libcharon-standard-plugins libcharon-extra-plugins moreutils firehol postfix mailutils unattended-upgrade certbot
-
+apt-get install -y strongswan libstrongswan-standard-plugins strongswan-libcharon libcharon-standard-plugins libcharon-extra-plugins moreutils firehol postfix mailutils unattended-upgrade certbot
 
 ETH0ORSIMILAR=$(ip route get 8.8.8.8 | awk -- '{printf $5}')
 IP=$(ifdata -pa $ETH0ORSIMILAR)
@@ -209,42 +192,11 @@ ${VPNUSERNAME} %any : EAP \""${VPNPASSWORD}"\"
 
 ipsec restart
 
-
-
-echo
-echo "--- User ---"
-echo
-
-# user + SSH
-
-id -u $LOGINUSERNAME &>/dev/null || adduser --disabled-password --gecos "" $LOGINUSERNAME
-echo "${LOGINUSERNAME}:${LOGINPASSWORD}" | chpasswd
-adduser ${LOGINUSERNAME} sudo
-
-sed -r \
--e "s/^#?Port 22$/Port ${SSHPORT}/" \
--e 's/^#?LoginGraceTime (120|2m)$/LoginGraceTime 30/' \
--e 's/^#?PermitRootLogin yes$/PermitRootLogin no/' \
--e 's/^#?X11Forwarding yes$/X11Forwarding no/' \
--e 's/^#?UsePAM yes$/UsePAM no/' \
--i.original /etc/ssh/sshd_config
-
-grep -Fq 'nribault/IKEv2-setup' /etc/ssh/sshd_config || echo "
-# https://github.com/nribault/IKEv2-setup
-MaxStartups 1
-MaxAuthTries 2
-UseDNS no" >> /etc/ssh/sshd_config
-
-service ssh restart
-
-
 echo
 echo "--- Timezone, mail, unattended upgrades ---"
 echo
 
 timedatectl set-timezone $TZONE
-/usr/sbin/update-locale LANG=en_GB.UTF-8
-
 
 sed -r \
 -e "s/^myhostname =.*$/myhostname = ${VPNHOST}/" \
@@ -254,7 +206,6 @@ sed -r \
 grep -Fq 'nribault/IKEv2-setup' /etc/aliases || echo "
 # https://github.com/nribault/IKEv2-setup
 root: ${EMAIL}
-${LOGINUSERNAME}: ${EMAIL}
 " >> /etc/aliases
 
 newaliases
@@ -280,8 +231,6 @@ service unattended-upgrades restart
 echo
 echo "--- Creating configuration files ---"
 echo
-
-cd /home/${LOGINUSERNAME}
 
 cat << EOF > vpn-ios-or-mac.mobileconfig
 <?xml version='1.0' encoding='UTF-8'?>
@@ -503,7 +452,7 @@ cat vpn-instructions.txt | mail -r $USER@$VPNHOST -s "VPN configuration" -A vpn-
 echo
 echo "--- How to connect ---"
 echo
-echo "Connection instructions have been emailed to you, and can also be found in your home directory, /home/${LOGINUSERNAME}"
+echo "Connection instructions have been emailed to you, and can also be found in your home directory"
 
 # necessary for IKEv2?
 # Windows: https://support.microsoft.com/en-us/kb/926179
