@@ -6,7 +6,7 @@
 # sudo do-release-upgrade -d -q
 
 # == Then run this script
-# curl -O http://bit.ly/2Fd1Zva
+# curl -L http://bit.ly/2Fd1Zva > setup.sh
 # chmod +x setup.sh
 # ./setup.sh
 
@@ -111,9 +111,9 @@ echo
 mkdir -p /etc/letsencrypt
 
 echo 'rsa-key-size = 4096
-pre-hook = /sbin/iptables -I INPUT -p tcp --dport 443 -j ACCEPT
-post-hook = /sbin/iptables -D INPUT -p tcp --dport 443 -j ACCEPT
-renew-hook = /usr/sbin/ipsec reload && /usr/sbin/ipsec secrets
+pre-hook = firehol stop
+post-hook = firehol start
+renew-hook = /usr/sbin/ipsec reload ; /usr/sbin/ipsec secrets
 ' > /etc/letsencrypt/cli.ini
 
 certbot certonly --non-interactive --agree-tos --email $EMAIL --standalone -d $VPNHOST
