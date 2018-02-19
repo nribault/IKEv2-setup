@@ -28,6 +28,9 @@ echo
 echo "** Note: hostname must resolve to this machine already, to enable Let's Encrypt certificate setup **"
 read -p "Hostname for VPN (e.g. vpn.example.com): " VPNHOST
 
+read -p "Which network would you like to pass through the VPN? (default: 0.0.0.0/0) " LEFTSUBNET
+LEFTSUBNET=${LEFTSUBNET:-'0.0.0.0/0'}
+
 apt -y install dnsutils
 VPNHOSTIP=$(dig -4 +short "$VPNHOST")
 [[ -n "$VPNHOSTIP" ]] || exit_badly "Cannot resolve VPN hostname, aborting"
@@ -176,7 +179,7 @@ conn roadwarrior
   leftid=@${VPNHOST}
   leftcert=cert.pem
   leftsendcert=always
-  leftsubnet=0.0.0.0/0
+  leftsubnet=$LEFTSUBNET
   right=%any
   rightid=%any
   rightauth=eap-mschapv2
@@ -447,12 +450,13 @@ A bash script to set up strongSwan as a VPN client is attached as vpn-ubuntu-cli
 
 EOF
 
-cat vpn-instructions.txt | mail -r $USER@$VPNHOST -s "VPN configuration" -A vpn-ios-or-mac.mobileconfig -A vpn-ubuntu-client.sh $EMAIL
+# buggy, emails do not arrive with attachments
+#cat vpn-instructions.txt | mail -r $USER@$VPNHOST -s "VPN configuration" -A vpn-ios-or-mac.mobileconfig -A vpn-ubuntu-client.sh $EMAIL
 
-echo
-echo "--- How to connect ---"
-echo
-echo "Connection instructions have been emailed to you, and can also be found in your home directory"
+#echo
+#echo "--- How to connect ---"
+#echo
+#echo "Connection instructions have been emailed to you, and can also be found in your home directory"
 
 # necessary for IKEv2?
 # Windows: https://support.microsoft.com/en-us/kb/926179
